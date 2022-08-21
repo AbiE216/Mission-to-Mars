@@ -11,8 +11,8 @@ mongo = PyMongo(app)
 #Set up app routes/ this is the root route?
 @app.route("/")
 def index():
-    mars = mongo.db.mars.find_one()
-    return render_template("index.html", mars=mars)
+   mars = mongo.db.mars.find_one()
+   return render_template("index.html", mars=mars)
 
 #Defines the route flask will be using
 @app.route("/scrape")
