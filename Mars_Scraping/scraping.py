@@ -19,7 +19,7 @@ def scrape_all():
         "featured_image": featured_images(browser),
         "facts": mars_facts(),
         "last_modified": dt.datetime.now(),
-        "hemispheres": hemisphere_images
+        "hemispheres": hemisphere_image_urls
     }
       # Stop webdriver and return data
     browser.quit()
@@ -100,12 +100,11 @@ def mars_facts():
       
     #convert table to html format
     return df.to_html(classes="table table-striped")
-if __name__=="__main__":
-    print(scrape_all())
+
 
 
 ###Mars Hemispheres images
-def hemisphere_images():
+def hemisphere_image_urls():
     executable_path = {'executable_path': ChromeDriverManager().install()}
     browser = Browser('chrome', **executable_path, headless=True)
     
@@ -151,4 +150,15 @@ def hemisphere_images():
         
     # 5. Quit the browser
     browser.quit()
-    return hemisphere_images
+    return hemisphere_image_urls
+
+if __name__=="__main__":
+    print(scrape_all())
+
+
+        
+
+
+
+
+
