@@ -19,7 +19,7 @@ def scrape_all():
         "featured_image": featured_images(browser),
         "facts": mars_facts(),
         "last_modified": dt.datetime.now(),
-        "hemispheres": hemisphere_image_urls
+        "hemispheres": hemisphere_images()
     }
       # Stop webdriver and return data
     browser.quit()
@@ -108,48 +108,47 @@ def hemisphere_images():
     executable_path = {'executable_path': ChromeDriverManager().install()}
     browser = Browser('chrome', **executable_path, headless=True)
     
-    # 1. Use browser to visit the URL 
     url = 'https://marshemispheres.com/'
 
     browser.visit(url)
 
-    # 2. Create a list to hold the images and titles.    
+    # 2. Create a list to hold the images and titles.
     hemisphere_image_urls = []
-    
+
     # 3. Write code to retrieve the image urls and titles for each hemisphere.
     html = browser.html
     img_soup = soup(html, 'html.parser')
 
-        
+    #all_items= img_soup.find('div', class_='collapsible results')
     items = img_soup.find_all('div', class_='item')
-    ### Hemispheres
-    try:
-        for item in items:
-            
-            hemispheres = {}
-            
-            title = item.find('h3').get_text()
-            
-            page_href=item.find('a').get('href')
-            browser.visit(f'https://marshemispheres.com/{page_href}')    
-            
-            html2 = browser.html
-            img_soup2 = soup(html2, 'html.parser')
-            full_image = img_soup2.find('div', class_='downloads').find('a').get('href')
-            
-            full_image_url = f'https://marshemispheres.com/{full_image}'
-            hemispheres = {
-                'img_url':full_image_url,
-                'title': title}
-            
-            hemisphere_image_urls.append(hemispheres)
 
-            browser.back()
-    except AttributeError:
-        return None
+    for item in items:
         
+        hemispheres = {}
+        
+        title = item.find('h3').get_text()
+        
+        page_href=item.find('a').get('href')
+        browser.visit(f'https://marshemispheres.com/{page_href}')    
+        
+        html2 = browser.html
+        img_soup2 = soup(html2, 'html.parser')
+        full_image = img_soup2.find('div', class_='downloads').find('a').get('href')
+        
+        full_image_url = f'https://marshemispheres.com/{full_image}'
+        hemispheres = {
+            'img_url':full_image_url,
+            'title': title}
+        
+        hemisphere_image_urls.append(hemispheres)
+
+    browser.back()
+
+           
 
     return hemisphere_image_urls
+
+
 
 if __name__=="__main__":
     print(scrape_all())
