@@ -104,7 +104,7 @@ def mars_facts():
 
 
 ###Mars Hemispheres images
-def hemisphere_image_urls():
+def hemisphere_images():
     executable_path = {'executable_path': ChromeDriverManager().install()}
     browser = Browser('chrome', **executable_path, headless=True)
     
@@ -148,14 +148,13 @@ def hemisphere_image_urls():
     except AttributeError:
         return None
         
-    # 5. Quit the browser
-    browser.quit()
+
     return hemisphere_image_urls
 
 if __name__=="__main__":
     print(scrape_all())
 
-
+ 
         
 
 

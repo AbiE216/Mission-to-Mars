@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_pymongo import PyMongo
-import scraping 
+import scraping
 
 app = Flask(__name__)
 
@@ -18,7 +18,7 @@ def index():
 #Start a function that the route will use
 #access the database, scrape the new data, update the database return a message when succesful.
 @app.route("/scrape")
-def scrape():
+def scrape_all():
    mars = mongo.db.mars
    mars_data = scraping.scrape_all()
    mars.update_one({}, {"$set":mars_data}, upsert=True)
