@@ -16,10 +16,10 @@ def scrape_all():
     data = {
         "news_title": news_title,
         "news_paragraph": news_paragraph,
-        "featured_image": featured_images(browser),
+        "featured_image": featured_image(browser),
         "facts": mars_facts(),
         "last_modified": dt.datetime.now(),
-        "hemispheres": hemisphere_images()
+        "hemispheres": hemispheres(browser)
     }
       # Stop webdriver and return data
     browser.quit()
@@ -58,7 +58,7 @@ def mars_news(browser):
 
 ### JPL Space images featured image
 
-def featured_images(browser):
+def featured_image(browser):
     
     # Visit URL
     url = 'https://spaceimages-mars.com'
@@ -101,53 +101,40 @@ def mars_facts():
     #convert table to html format
     return df.to_html(classes="table table-striped")
 
-
-
 ###Mars Hemispheres images
-def hemisphere_images():
-    executable_path = {'executable_path': ChromeDriverManager().install()}
-    browser = Browser('chrome', **executable_path, headless=True)
-    
+def hemispheres(browser):
     url = 'https://marshemispheres.com/'
-
-    browser.visit(url)
-
-    # 2. Create a list to hold the images and titles.
+    browser.visit(url + 'index.html')
+    # Click the link, find the sample anchor, return the href
     hemisphere_image_urls = []
-
-    # 3. Write code to retrieve the image urls and titles for each hemisphere.
-    html = browser.html
-    img_soup = soup(html, 'html.parser')
-
-    #all_items= img_soup.find('div', class_='collapsible results')
-    items = img_soup.find_all('div', class_='item')
-
-    for item in items:
-        
-        hemispheres = {}
-        
-        title = item.find('h3').get_text()
-        
-        page_href=item.find('a').get('href')
-        browser.visit(f'https://marshemispheres.com/{page_href}')    
-        
-        html2 = browser.html
-        img_soup2 = soup(html2, 'html.parser')
-        full_image = img_soup2.find('div', class_='downloads').find('a').get('href')
-        
-        full_image_url = f'https://marshemispheres.com/{full_image}'
-        hemispheres = {
-            'img_url':full_image_url,
-            'title': title}
-        
-        hemisphere_image_urls.append(hemispheres)
-
-    browser.back()
-
-           
-
+    for i in range(4):
+        # Find the elements on each loop to avoid a stale element exception
+        browser.find_by_css("a.product-item img")[i].click()
+        hemi_data = scrape_hemisphere(browser.html)
+        hemi_data['img_url'] = url + hemi_data['img_url']
+        # Append hemisphere object to list
+        hemisphere_image_urls.append(hemi_data)
+        # Finally, we navigate backwards
+        browser.back()
     return hemisphere_image_urls
 
+
+def scrape_hemisphere(html_text):
+    # parse html text
+    hemi_soup = soup(html_text, "html.parser")
+    # adding try/except for error handling
+    try:
+        title_elem = hemi_soup.find("h2", class_="title").get_text()
+        sample_elem = hemi_soup.find("a", text="Sample").get("href")
+    except AttributeError:
+        # Image error will return None, for better front-end handling
+        title_elem = None
+        sample_elem = None
+    hemispheres = {
+        "title": title_elem,
+        "img_url": sample_elem
+    }
+    return hemispheres
 
 
 if __name__=="__main__":
